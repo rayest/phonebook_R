@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/mvc
+       http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+
+    <!--
+      不能有此项，因为下文有注册过该bean，否则会出现ambiguous报错；
+      <context:component-scan base-package="com.tgb.web.controller2"/>
+    -->
+    <mvc:annotation-driven/>
+
+    <!--1.获取数据源，配置BasicDataSource-->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"></property>
+        <property name="url" value = "jdbc:mysql://localhost/model.db?useUnicode=true&amp;useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=UTC&amp;useSSL=true"></property>
+        <property name="username" value="root"></property>
+        <property name="password" value="199011081108"></property>
+    </bean>
+
+    <!--2.给jdbc模板注入数据源，配置dataSource，使SimpleJdbcTemplate正常工作-->
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"></property>
+        <!--也可以代替以：<constructor-arg ref="dataSource" />  -->
+    </bean>
+
+    <!--3.给JdbcUserDao注入模板，装配JdbcUserDao的jdbcTemplate属性-->
+    <bean id="JdbcUserDao" class="cn.rayest.web.DaoModel.JdbcUserDao">
+        <property name="jdbcTemplate" ref="jdbcTemplate"></property>
+    </bean>
+
+    <!--4.给控制器注入Dao类-->
+    <bean id="LoginController" class="cn.rayest.web.controller2.LoginController">
+        <property name="JdbcUserDao" ref="JdbcUserDao"></property>
+    </bean>
+
+    <!--5.配置映射响应器，映射响应器会根据请求文件来决定进入到哪个控制器，-->
+    <bean id="mapping1" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="mappings">
+            <props>
+                <!-- 这里的key就是你的action请求，后面是要分派的控制器-->
+                <prop key="login.do">LoginController</prop>
+            </props>
+        </property>
+    </bean>
+
+
+    <bean id="FindController" class="cn.rayest.web.controller2.FindController">
+        <property name="JdbcUserDao" ref="JdbcUserDao"></property>
+    </bean>
+    <bean id="mapping2" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="mappings">
+            <props>
+                <!-- 这里的key就是你的action请求，后面是要分派的控制器-->
+                <prop key="find">FindController</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="DeleteController" class="cn.rayest.web.controller2.DeleteController">
+        <property name="JdbcUserDao" ref="JdbcUserDao"></property>
+    </bean>
+    <bean id="mapping3" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="mappings">
+            <props>
+                <!-- 这里的key就是你的action请求，后面是要分派的控制器-->
+                <prop key="delete">DeleteController</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="InsertController" class="cn.rayest.web.controller2.InsertController">
+        <property name="JdbcUserDao" ref="JdbcUserDao"></property>
+    </bean>
+    <bean id="mapping4" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="mappings">
+            <props>
+                <!-- 这里的key就是你的action请求，后面是要分派的控制器-->
+                <prop key="insert">InsertController</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="EditController" class="cn.rayest.web.controller2.EditController">
+        <property name="JdbcUserDao" ref="JdbcUserDao"></property>
+    </bean>
+    <bean id="mapping5" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="mappings">
+            <props>
+                <!-- 这里的key就是你的action请求，后面是要分派的控制器-->
+                <prop key="edit">EditController</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="SelectByIdController" class="cn.rayest.web.controller2.SelectByIdController">
+        <property name="JdbcUserDao" ref="JdbcUserDao"></property>
+    </bean>
+    <bean id="mapping6" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="mappings">
+            <props>
+                <!-- 这里的key就是你的action请求，后面是要分派的控制器-->
+                <prop key="edit">EditController</prop>
+            </props>
+        </property>
+    </bean>
+
+
+
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/views/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+</beans>
